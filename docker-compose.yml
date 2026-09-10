@@ -1,77 +1,39 @@
-# docker-compose.yml
-
-version: '3.8'
-
 services:
-  # Serviço da base de dados PostgreSQL
-  postgres:
-    image: postgres:15-alpine
-    container_name: pg-todolist
+  postgres15:
+    container_name: postgres15
+    image: postgres:15
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: todolist
+      TZ: "Atlantic/Cape_Verde"
+    volumes:
+      - pg15_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
     networks:
-      - todolist-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d todolist"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
+      - network-postgres
 
-  # Serviço da aplicação Node.js
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: todolist-app
-    ports:
-      - "3000:3000"
+  pgadmin4:
+    container_name: pgadmin4
+    image: dpage/pgadmin4:9.2
+    restart: unless-stopped
     environment:
-      - NODE_ENV=development
-      - PORT=3000
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=todolist
-    volumes:
-      - .:/app
-      - /app/node_modules
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - todolist-network
-    command: npm run dev
-    restart: unless-stopped
-
-  # (Opcional) Adminer - Interface web para gerir a base de dados
-  adminer:
-    image: adminer:latest
-    container_name: todolist-adminer
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: postgres
     ports:
-      - "8080:8080"
-    environment:
-      - ADMINER_DEFAULT_SERVER=postgres
+      - "5050:80"
+    volumes:
+      - pgadmin-2025:/var/lib/pgadmin
     networks:
-      - todolist-network
-    depends_on:
-      - postgres
-    restart: unless-stopped
+      - network-postgres
 
-# Volumes persistentes
 volumes:
-  postgres_data:
-    driver: local
+  pg15_data:
+    name: pg15_data
 
-# Redes
+  pgadmin-2025:
+    name: pgadmin-2025
+
 networks:
-  todolist-network:
-    driver: bridge
+  network-postgres:
