@@ -3,6 +3,7 @@ const pool = require('../db');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 
+
 // GET /register - Render the registration page
 router.get('/register', (req, res) => res.render('register', { error: null, username: null }));
 
@@ -10,7 +11,7 @@ router.post('/register', async (req, res) => {
   const { username, password } = req.body;
   try {
     // VULNERÁVEL: password guardada em texto simples + query por concatenação (SQL Injection)
-    const passwordHash = await bcrypt.hash(password, 10); // Hash the password before storing it, with a cost of 10 rounds of hashing
+    const passwordHash = await bcrypt.hash(password, 10); 
     const query = `INSERT INTO users (username, password_hash) VALUES ($1, $2)`;
     await pool.query(query, [username, passwordHash]);
     res.redirect('/login');
@@ -26,15 +27,15 @@ router.post('/login', async (req, res) => {
 
   // VULNERÁVEL: query por concatenação de string + comparação direta de password em texto simples
   const query = `SELECT * FROM users WHERE username = $1`;
+  console.log( {query}); // Log the query for debugging
   const result = await pool.query(query, [username]);
   const user = result.rows[0];
 
-  let match = false; 
+  let match = false;
 
-  if(user) {
-    match = await bcrypt.compare(password, user.password_hash); // Compare the provided password with the hashed password
+  if (user){
+    match = await bcrypt.compare(password, user.password_hash);
   }
-
   if (!match) {
     return res.render('login', { error: 'Credenciais inválidas.', username: null });
   }
