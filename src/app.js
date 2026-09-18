@@ -19,7 +19,7 @@ app.set('views', 'views'); // Set the directory for EJS templates
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies (for form submissions)
 app.use(express.json()); // Parse corpos em JSON (necessário para a API em /api/*)
 
-// Configure session
+// Configure session 
 app.use(session({
   secret: process.env.SESSION_SECRET, // Secret key for session encryption
   resave: false,

@@ -1,15 +1,15 @@
 services:
 
 
-  # todolist-app:
-  #   container_name: todolist-app
-  #   #build: .
-  #   image: todolist-app:0.0.0
-  #   ports:
-  #     - "3000:3000"
-  #   env_file: .env
-  #   networks:
-  #     - todolist-network
+  todolist-app:
+    container_name: todolist-app
+    build: .
+    image: todolist-app:0.0.0
+    ports:
+      - "3000:3000"
+    env_file: .env
+    networks:
+      - todolist-network
   
   postgres15:
     container_name: postgres15
